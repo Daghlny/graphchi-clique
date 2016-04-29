@@ -1,0 +1,51 @@
+Print top 20 vertices:
+1. 163075	626.055
+2. 41909	622.983
+3. 597621	578.524
+4. 537039	556.652
+5. 384666	503.063
+6. 32163	498.956
+7. 504140	496.97
+8. 486980	487.504
+9. 605856	478.424
+10. 551829	462.139
+11. 558791	445.642
+12. 751384	435.813
+13. 7314	425.098
+14. 173976	413.794
+15. 213432	412.787
+16. 765334	410.851
+17. 425770	409.925
+18. 885605	390.004
+19. 407610	389.416
+20. 691633	378.207
+
+ === REPORT FOR pagerank() ===
+[Numeric]
+cachesize_mb:		0
+compression:		0
+execthreads:		1
+loadthreads:		4
+membudget_mb:		800
+niothreads:		2
+niters:		4
+nshards:		1
+nvertices:		916428
+scheduler:		0
+stripesize:		1.07374e+09
+updates:		3.66571e+06
+work:		0
+[Timings]
+execute-updates:		0.233285s	 (count: 4, min: 0.015578s, max: 0.074113, avg: 0.0583213s)
+inmem-exec:		0.233322s	 (count: 4, min: 0.01559s, max: 0.074122, avg: 0.0583305s)
+iomgr_init:		0.00019 s
+memoryshard_create_edges:		0.89255 s
+preada_now:		0.019952s	 (count: 4, min: 0.001463s, max: 0.010418, avg: 0.004988s)
+pwritea_now:		0.001468 s
+runtime:		1.2054 s
+stripedio_wait_for_reads:		2e-06 s
+stripedio_wait_for_writes:		1.2e-05s	 (count: 3, min: 1e-06s, max: 8e-06, avg: 4e-06s)
+[Other]
+app:	pagerank
+engine:	default
+file:	/root/graph-data/web-Google.txt

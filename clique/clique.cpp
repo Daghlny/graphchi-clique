@@ -1,36 +1,17 @@
 
 /**
- * @file
- * @author  Aapo Kyrola <akyrola@cs.cmu.edu>
+ * @file    clique.cpp
+ * @author  Yinuo Li < liyinuo@hust.edu.cn >
  * @version 1.0
- *
- * @section LICENSE
- *
- * Copyright [2012] [Aapo Kyrola, Guy Blelloch, Carlos Guestrin / Carnegie Mellon University]
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- 
  *
  * @section DESCRIPTION
  *
- * Template for GraphChi applications. To create a new application, duplicate
- * this template.
  */
 
 
 
 #include <string>
-
+#include <set>
 #include "graphchi_basic_includes.hpp"
 
 using namespace graphchi;
@@ -41,11 +22,20 @@ using namespace graphchi;
   */
 
 struct bk_tree_t {
-    vid_t *nbs;
 
+    vid_t *c;
+    size_t c_index;
+    size_t cand_index;
+    size_t len;
 }
-typedef my_vertex_type VertexDataType;
-typedef my_edge_type EdgeDataType;
+
+struct nb_info_t{
+    vid_t *nbs;
+    size_t len;
+}
+
+typedef struct bk_tree_t VertexDataType;
+typedef struct nb_info_t EdgeDataType;
 
 /**
   * GraphChi programs need to subclass GraphChiProgram<vertex-type, edge-type> 
@@ -64,7 +54,7 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                on each run, GraphChi will modify the data files. To start from scratch, it is easiest
                do initialize the program in code. Alternatively, you can keep a copy of initial data files. */
             // vertex.set_data(init_value);
-        
+            EdgeDataType    
         } else {
             /* Do computation */ 
 
