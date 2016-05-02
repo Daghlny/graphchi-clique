@@ -54,7 +54,7 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                on each run, GraphChi will modify the data files. To start from scratch, it is easiest
                do initialize the program in code. Alternatively, you can keep a copy of initial data files. */
             // vertex.set_data(init_value);
-            EdgeDataType    
+            
         } else {
             /* Do computation */ 
 
@@ -132,3 +132,4 @@ int main(int argc, const char ** argv) {
     metrics_report(m);
     return 0;
 }
+
