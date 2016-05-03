@@ -12,12 +12,9 @@
 
 #include <string>
 #include <set>
-#include <iostream>
 #include "graphchi_basic_includes.hpp"
 
 using namespace graphchi;
-
-#define GRAPHCHI_DISABLE_COMPRESSION
 
 /**
   * Type definitions. Remember to create suitable graph shards using the
@@ -30,12 +27,12 @@ struct bk_tree_t {
     vid_t *cand;
     size_t ne;
     size_t len;
-};
+}
 
 struct nb_info_t{
     vid_t *nbs;
     size_t len;
-};
+}
 
 typedef struct bk_tree_t VertexDataType;
 typedef struct nb_info_t EdgeDataType;
@@ -52,28 +49,19 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
      */
     void update(graphchi_vertex<VertexDataType, EdgeDataType> &vertex, graphchi_context &gcontext) {
 
-        if (gcontext.iteration == 0) {
+        if (ginfo.iteration == 0) {
            
             // on first iteration, build every vertex's search tree root
             
-            std::cout << "*** the vertex is " << vertex.id() << std::endl;
-            std::cout << "*** the vertex's edges:  " << vertex.num_edges() << std::endl;
-            std::cout << "*** the vertex's out_edges:  " << vertex.num_outedges() << std::endl;
-            std::cout << "*** the vertex's in_edges:  " << vertex.num_inedges() << std::endl;
             bk_tree_t* cur_root = new bk_tree_t();
-            std::cout << "***check point 1 ***" << std::endl;
-            cur_root->len = vertex.num_edges();
-            cur_root->c = new vid_t[vertex.num_edges()];
-            cur_root->cand = new vid_t [vertex.num_edges()];
-            std::cout << "***check point 2 ***" << std::endl;
+            curr_root->len = vertex.num_edges();
 
             for(int i = 0; i != vertex.num_edges(); ++i){
-                std::cout << "***check point 3 ***" << std::endl;
-                (cur_root->c)[i] = vertex.edge(i)->vertex_id();
-                (cur_root->cand)[i] = vertex.edge(i)->vertex_id();
+                curr_root->c[i] = vertex.edges(i)->vertex_id();
+                curr_root->cand[i] = vertex.edges(i)->vertex_id();
             }
             // initialize the indices of three sets
-            cur_root->ne = 0;
+            curr_root->ne = 0;
 
 
         } else {

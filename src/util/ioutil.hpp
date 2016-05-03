@@ -25,6 +25,7 @@
  *
  * I/O Utils.
  */
+
 #ifndef DEF_IOUTIL_HPP
 #define DEF_IOUTIL_HPP
 
@@ -98,8 +99,6 @@ void pwritea(int f, T * tbuf, size_t nbytes, size_t off) {
         nwritten += a;
     }
 }
-
-
 
 
 template <typename T>
