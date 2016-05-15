@@ -201,26 +201,6 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
             task_t *first_task = new task_t( cur_cand, cur_c, vertex.id() );
             tmp_tlist->insert_tail(first_task);
 
-#ifdef CLIQUE_DEBUG
-            dfile << "[iteration " << gcontext.iteration << "]";
-            dfile << "[Initialize Task] " << "Cand: ";
-            for( vlist::iterator iter = cur_cand->begin(); 
-                 iter != cur_cand->end();
-                 ++iter ) {
-                dfile << *iter << " ";
-            }
-            dfile << " | ";
-            dfile << "C: ";
-            for( vlist::iterator iter = cur_c->begin(); 
-                 iter != cur_c->end();
-                 ++iter ) {
-                dfile << *iter << " ";
-            }
-            dfile << std::endl;
-
-#endif
-
-
             // if @vertex.id() > neighbor.id()
             // @vertex should store its adjacency list in the edge between them
             for( int i = 0; i != vertex.num_edges(); ++i) {
@@ -242,9 +222,9 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
 
             tasks->remove_head();
             if ( t->cand->size() == 0) {
-                /* do something about storing maximal clique in t->cand */
+                /* do something about storing maximal clique in t->c */
                 #ifdef CLIQUE_OUT_FILE
-                write_clique_file(t->cand, cfile);
+                write_clique_file(t->c, cfile);
                 #endif
                 return ;
             }
@@ -257,8 +237,7 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
 
                     if ( *iter < t->flag ) continue;
 
-                    // Add New Task
-                    //
+                    /* Add New Task */
                     // First, construct two necessary vertex sets
                     // Second, if candidate set is empty, c is a MC
                     vlist *adjlist = NULL;
