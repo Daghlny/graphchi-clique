@@ -300,6 +300,10 @@ namespace graphchi {
         VertexDataType get_data() {
             return *(this->dataptr);
         }
+
+        VertexDataType *get_data_ptr() {
+            return this->dataptr;
+        }
 #else
         // VertexDataType must be a chivector
         VertexDataType * get_vector() {

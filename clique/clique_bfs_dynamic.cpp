@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "graphchi_basic_includes.hpp"
+#include "clique_bfs.hpp"
 
 using namespace graphchi;
 
@@ -16,93 +17,6 @@ using namespace graphchi;
 #ifdef CLIQUE_DEBUG
 std::ofstream dfile;
 #endif
-
-/**
-  * Type definitions. Remember to create suitable graph shards using the
-  * Sharder-program. 
-  */
-
-typedef std::set<vid_t> vlist;
-
-// @task_t represents a indenpendent task to compute cliques from @cand
-// @flag is the biggest index of vertices having visited
-struct task_t{
-
-    task_t( vlist *x_cand, vlist *x_c, vid_t x_flag,
-            task_t *x_pre = NULL, task_t *x_next = NULL): 
-        cand(x_cand), c(x_c), flag(x_flag), pre(x_pre), next(x_next){}
-
-    vlist   *cand;
-    vlist   *c;
-    vid_t   flag;
-    task_t  *pre;
-    task_t  *next;
-};
-
-struct tasklist {
-
-    tasklist(task_t *h, task_t *t): head(h), tail(t), len(0){}
-
-    void remove_tail() {
-        
-        --len;
-
-        if(tail == NULL && head == NULL){
-            return ;
-        } else if(tail != NULL && head != NULL && tail != head){
-            tail->pre->next = NULL;
-            tail = tail->pre;
-        } else if(tail != NULL && head != NULL && tail == head){
-            head = NULL;
-            tail = NULL;
-        } else {
-            std::cout << "Remove Error" << std::endl;
-            exit(0);
-        }
-
-    }
-
-    void remove_head() {
-        
-        if(tail == NULL && head == NULL){
-            return ;
-        } else if (tail != NULL && head != NULL && tail != head) {
-            head->next->pre = NULL;
-            head = head->next;
-        } else if (tail != NULL && head != NULL && tail == head) {
-            head = NULL;
-            tail = NULL;
-        } else {
-            std::cout << "Remove queue's head Error" << std::endl;
-            exit(0);
-        }
-    }
-
-    void insert_tail( task_t *tmp ) {
-        
-        ++len;
-
-        if( head == NULL && tail == NULL ){
-            head = tmp;
-            tail = tmp;
-            tmp->pre = NULL;
-            tmp->next = NULL;
-        } else if(head != NULL && tail != NULL){
-            tmp->pre = tail;
-            tail->next = tmp;
-            tail = tmp;
-            tmp->next = NULL;
-        } else {
-            std::cout << "Queue insert Error " << std::endl;
-            exit(0);
-        }
-
-    }
-
-    task_t *head;
-    task_t *tail;
-    size_t len;
-};
 
 
 vlist* 
@@ -157,10 +71,6 @@ print_vlist(vlist *v){
     std::cout << std::endl;
 }
 
-#ifdef CLIQUE_OUT_FILE
-    std::ofstream cfile;
-#endif
-/* this function need to be finished */
 void
 write_clique_file( vlist* clique, std::ofstream &cfile){
 
@@ -177,10 +87,12 @@ write_clique_file( vlist* clique, std::ofstream &cfile){
 typedef tasklist VertexDataType ;
 typedef vlist* EdgeDataType;
 
-/**
-  * GraphChi programs need to subclass GraphChiProgram<vertex-type, edge-type> 
-  * class. The main logic is usually in the update function.
-  */
+bool converged = true;
+
+#ifdef CLIQUE_OUT_FILE
+    std::ofstream cfile;
+#endif
+
 struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> {
     
  
@@ -215,12 +127,14 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
 
         } else {
             
-            tasklist *tasks = &(vertex.get_data());
-            task_t   *t     = vertex.get_data().head;
+            tasklist *tasks = vertex.get_data_ptr();
+            task_t   *t     = tasks->head;
 
             if ( t == NULL ){
                 return ;
             }
+
+            converged = false;
 
             tasks->remove_head();
             if ( t->cand->size() == 0) {
@@ -273,9 +187,14 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
     }
     
     void before_iteration(int iteration, graphchi_context &gcontext) {
+        converged = true;
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
+        std::cout << iteration << "  ||  " << converged << std::endl;
+        if(converged && iteration != 0){
+            gcontext.set_last_iteration(iteration);
+        }
     }
     
     void before_exec_interval(vid_t window_st, vid_t window_en, graphchi_context &gcontext) {        
@@ -297,7 +216,7 @@ int main(int argc, const char ** argv) {
     
     /* Basic arguments for application */
     std::string filename = get_option_string("file");  // Base filename
-    int niters           = get_option_int("niters", 4); // Number of iterations
+    int niters           = get_option_int("niters", 1000000); // Number of iterations
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
 
 #ifdef CLIQUE_OUT_FILE
