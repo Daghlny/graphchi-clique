@@ -1,6 +1,8 @@
 
 # Added By Yinuo
 tags
+clique/clique
+clique/*.out
 
 # Compiled Object files
 *.slo

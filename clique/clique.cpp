@@ -12,6 +12,7 @@
 
 #include <string>
 #include <set>
+#include <stack>
 #include <iostream>
 #include "graphchi_basic_includes.hpp"
 
@@ -24,6 +25,28 @@ using namespace graphchi;
   * Sharder-program. 
   */
 
+struct bk_set{
+
+    bk_set(size_t c_len, size_t cand_len, size_t nc_len):
+        c(c_len), cand(cand_len), nc(nc_len){}
+    bk_set(std::set<vid_t> xc, std::set<vid_t> xcand, std::set<vid_t> xnc):
+        c(xc), cand(xcand), nc(xnc){}
+
+    std::set<vid_t> c;
+    std::set<vid_t> cand;
+    std::set<vid_t> nc;
+}
+
+typedef std::stack<bk_set> bk_stack;
+
+struct bk_node{
+
+    bk_stack *stack;
+    bk_set   *curr;
+}
+
+
+/*
 struct bk_tree_t {
 
     vid_t *c;
@@ -31,14 +54,11 @@ struct bk_tree_t {
     size_t ne;
     size_t len;
 };
+*/
 
-struct nb_info_t{
-    vid_t *nbs;
-    size_t len;
-};
 
-typedef struct bk_tree_t VertexDataType;
-typedef struct nb_info_t EdgeDataType;
+typedef struct bk_node VertexDataType;
+typedef std::set<vid_t>*  EdgeDataType;
 
 /**
   * GraphChi programs need to subclass GraphChiProgram<vertex-type, edge-type> 
@@ -56,44 +76,50 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
            
             // on first iteration, build every vertex's search tree root
             
-            std::cout << "*** the vertex is " << vertex.id() << std::endl;
-            std::cout << "*** the vertex's edges:  " << vertex.num_edges() << std::endl;
-            std::cout << "*** the vertex's out_edges:  " << vertex.num_outedges() << std::endl;
-            std::cout << "*** the vertex's in_edges:  " << vertex.num_inedges() << std::endl;
-            bk_tree_t* cur_root = new bk_tree_t();
-            std::cout << "***check point 1 ***" << std::endl;
-            cur_root->len = vertex.num_edges();
-            cur_root->c = new vid_t[vertex.num_edges()];
-            cur_root->cand = new vid_t [vertex.num_edges()];
-            std::cout << "***check point 2 ***" << std::endl;
+            bk_node tmp_value;
+            tmp_value.stack = new bk_stack(0); 
+            tmp_value.curr  = NULL;
+            vertex.set_data(tmp_value);
+            
+            // construct a set storing all neighbors of @vertex
+            std::set<vid_t> all_neighbors();
+            for( int i = 0; i != vertex.num_edges(); ++i )
+                all_neighbors.insert( vertex.edge(i)->vertex_id() );
 
-            for(int i = 0; i != vertex.num_edges(); ++i){
-                std::cout << "***check point 3 ***" << std::endl;
-                (cur_root->c)[i] = vertex.edge(i)->vertex_id();
-                (cur_root->cand)[i] = vertex.edge(i)->vertex_id();
-            }
-            // initialize the indices of three sets
-            cur_root->ne = 0;
-
+            // when a neighbor's id is smaller than @vertex,
+            // this neighbor should get all the neighbors of @vertex
+            for( int i = 0; i != vertex.num_edges(); ++i )
+                if( vertex.edge(i)->vertex_id() < v.id() ){
+                    std::set<vid_t> *tmp_edge = 
+                        new std::set<vid_t>(all_neighbors);
+                    vertex.edge(i)->set_data(tmp_edge);
+                }
 
         } else {
-            /* Do computation */ 
-
-            /* Loop over in-edges (example) */
-            for(int i=0; i < vertex.num_inedges(); i++) {
-                // Do something
-            //    value += vertex.inedge(i).get_data();
-            }
-            
-            /* Loop over out-edges (example) */
-            for(int i=0; i < vertex.num_outedges(); i++) {
-                // Do something
-                // vertex.outedge(i).set_data(x)
-            }
-            
             /* Loop over all edges (ignore direction) */
+            // 
+
+            bk_node node = vertex.get_data();
+            if( node->curr->cand.size() == 0 
+                && node->curr->nc.size() == 0){
+
+                output_clique(node->curr->c);
+                return;
+            }
+
+            // create every candidate branch of current search subtree node
+            for( std::set<vid_t>::iterator iter = node->curr->cand.begin(); 
+                 iter != node->curr->cand.end(); 
+                 ++iter ){
+
+                tmp_vid = *iter;
+                node->curr->c.insert(tmp_vid);
+                node->curr->cand()
+                bk_set new_set(node->curr->c)
+            }
+            
             for(int i=0; i < vertex.num_edges(); i++) {
-                // vertex.edge(i).get_data() 
+                
             }
             
             // v.set_data(new_value);
