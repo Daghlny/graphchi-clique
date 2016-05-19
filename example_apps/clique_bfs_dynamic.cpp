@@ -74,6 +74,7 @@ print_vlist(vlist *v){
 void
 write_clique_file( vlist* clique, std::ofstream &cfile){
 
+    print_vlist(clique);
     for( vlist::iterator iter = clique->begin();
          iter != clique->end();
          ++iter) {
