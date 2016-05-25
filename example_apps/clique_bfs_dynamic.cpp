@@ -23,7 +23,6 @@ vlist*
 get_intsct(vlist *v1, vlist *v2){
     
     vlist *res    = new vlist();
-    /*
     vlist *lo     = v1->size() > v2->size() ? v2 : v1;
     vlist *check  = lo == v1 ? v2 : v1;
 
@@ -32,19 +31,7 @@ get_intsct(vlist *v1, vlist *v2){
          ++iter )
         if( check->find(*iter) != check->end() )
             res->insert(*iter);
-    */
 
-    /* new version of intersect operation, time complexity is O(n+m) */
-    vlist::iterator i = v1->begin(), j = v2->begin();
-    while( i != v1->end() && j != v2->end() ) {
-        if(*i < *j) i++;
-        else if (*j < *i) j++;
-        else {
-            res->insert(*i);
-            i++;
-            j++;
-        }
-    }
     return res;
 }
 
@@ -76,7 +63,7 @@ set_insert_copy( vid_t v ){
 void
 print_vlist(vlist *v){
    
-    std::cout << "vlist: ";
+    std::cout << "clique: ";
     for(vlist::iterator iter = v->begin();
         iter != v->end();
         ++iter )
@@ -87,10 +74,7 @@ print_vlist(vlist *v){
 void
 write_clique_file( vlist* clique, std::ofstream &cfile){
 
-<<<<<<< HEAD
-    //print_vlist(clique);
-=======
->>>>>>> fce99d1f9a00835dbf09ad20ac20381909e9f514
+    print_vlist(clique);
     for( vlist::iterator iter = clique->begin();
          iter != clique->end();
          ++iter) {
@@ -158,7 +142,6 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                 #ifdef CLIQUE_OUT_FILE
                 write_clique_file(t->c, cfile);
                 #endif
-                release_task(t);
                 return ;
             }
 
@@ -180,20 +163,19 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                             break;
                         }
                     }
-
                     vlist *candidate = get_intsct(adjlist, t->cand);
-                    vlist *c         = set_insert_copy(t->c, *iter);
+                    vlist *newc      = set_insert_copy(t->c, *iter);
 
                     if (candidate->size() != 0) {
-                        task_t *tmp = new task_t(candidate, c, *iter);
+                        task_t *tmp = new task_t(candidate, newc, *iter);
                         tasks->insert_tail(tmp);
                     } else {
                         // output clique
                         #ifdef CLIQUE_OUT_FILE
-                        write_clique_file(c, cfile);
+                        write_clique_file(newc, cfile);
                         #endif
                         delete candidate;
-                        delete c;
+                        delete newc;
                     }
                 } // for end
             }
@@ -209,7 +191,7 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
-        //std::cout << iteration << "  ||  " << converged << std::endl;
+        std::cout << iteration << "  ||  " << converged << std::endl;
         if(converged && iteration != 0){
             gcontext.set_last_iteration(iteration);
         }
