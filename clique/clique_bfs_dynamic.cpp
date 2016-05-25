@@ -87,10 +87,6 @@ print_vlist(vlist *v){
 void
 write_clique_file( vlist* clique, std::ofstream &cfile){
 
-<<<<<<< HEAD
-    //print_vlist(clique);
-=======
->>>>>>> fce99d1f9a00835dbf09ad20ac20381909e9f514
     for( vlist::iterator iter = clique->begin();
          iter != clique->end();
          ++iter) {
