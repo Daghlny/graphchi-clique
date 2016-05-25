@@ -18,6 +18,7 @@ using namespace graphchi;
 std::ofstream dfile;
 #endif
 
+long long curr_iteration_task_num;
 
 vlist* 
 get_intsct(vlist *v1, vlist *v2){
@@ -196,16 +197,19 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
 
             release_task(t);
 
-
         } // else end // for iteration != 0
+        curr_iteration_task_num += vertex.get_data_ptr()->len;
     }
     
     void before_iteration(int iteration, graphchi_context &gcontext) {
         converged = true;
+        curr_iteration_task_num = 0;
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
         //std::cout << iteration << "  ||  " << converged << std::endl;
+        std::cout << "Remaining Tasks' number: " << curr_iteration_task_num;
+        std::cout << std::endl;
         if(converged && iteration != 0){
             gcontext.set_last_iteration(iteration);
         }
