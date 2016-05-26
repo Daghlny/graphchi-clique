@@ -109,8 +109,15 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
             tasklist cur_tlist(NULL, NULL);
             vlist *cur_cand = new vlist();
             vlist *cur_c    = new vlist();
-            for( int i = 0; i != vertex.num_edges(); ++i)
-                cur_cand->insert(vertex.edge(i)->vertex_id());
+
+            vlist *all_neibors = new vlist();
+
+            for( int i = 0; i != vertex.num_edges(); ++i){
+                if( vertex.edge(i)->vertex_id() > vertex.id() )
+                    cur_cand->insert(vertex.edge(i)->vertex_id());
+                all_neibors->insert(vertex.edge(i)->vertex_id());
+            }
+
             cur_c->insert(vertex.id());
 
             task_t *first_task = new task_t( cur_cand, cur_c, vertex.id() );
@@ -122,8 +129,7 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
             for( int i = 0; i != vertex.num_edges(); ++i) {
                 
                 if( vertex.edge(i)->vertex_id() < vertex.id() ) {
-                    vlist *e_val = new vlist(*cur_cand);
-                    vertex.edge(i)->set_data(e_val);
+                    vertex.edge(i)->set_data(all_neibors);
                 }
             }
 
@@ -169,6 +175,17 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                         }
                     }
 
+                    if( adjlist == NULL ) {
+                        std::cout << "in current task, adjlist is NULL ";
+                        std::cout << std::endl << "info: " << std::endl;
+                        std::cout << "current vertex" << vertex.id() << std::endl;
+                        std::cout << "cand: ";
+                        print_vlist(t->cand);
+                        std::cout << "c: ";
+                        print_vlist(t->c);
+                        std::cout << "flag: " << t->flag << std::endl;
+                        exit();
+                    }
                     vlist *candidate = get_intsct(adjlist, t->cand);
                     vlist *c         = set_insert_copy(t->c, *iter);
 
