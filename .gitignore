@@ -3,6 +3,7 @@
 tags
 clique/clique
 clique/*.out
+*.data
 
 # Compiled Object files
 *.slo
