@@ -240,7 +240,7 @@ int main(int argc, const char ** argv) {
 
 #ifdef CLIQUE_OUT_FILE
     std::string clique_filename = filename+".clique.data";
-    cfile.open(clique_filename);
+    cfile.open(clique_filename.c_str());
 #endif
 
 #ifdef CLIQUE_DEBUG
