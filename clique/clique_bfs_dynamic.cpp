@@ -24,16 +24,6 @@ vlist*
 get_intsct(vlist *v1, vlist *v2){
     
     vlist *res    = new vlist();
-    /*
-    vlist *lo     = v1->size() > v2->size() ? v2 : v1;
-    vlist *check  = lo == v1 ? v2 : v1;
-
-    for( vlist::const_iterator iter = lo->begin();
-         iter != lo->end();
-         ++iter )
-        if( check->find(*iter) != check->end() )
-            res->insert(*iter);
-    */
 
     /* new version of intersect operation, time complexity is O(n+m) */
     vlist::iterator i = v1->begin(), j = v2->begin();
