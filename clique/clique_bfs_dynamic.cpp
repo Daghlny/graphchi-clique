@@ -12,7 +12,7 @@ using namespace graphchi;
 
 
 #define CLIQUE_OUT_FILE
-#define CLIQUE_DEBUG
+//#define CLIQUE_DEBUG
 
 #ifdef CLIQUE_DEBUG
 std::ofstream dfile;
@@ -116,7 +116,6 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
         // the insert it into task queue.
         if (gcontext.iteration == 0) {
             
-            //tasklist *tmp_tlist = new tasklist(NULL, NULL);
             tasklist cur_tlist(NULL, NULL);
             vlist *cur_cand = new vlist();
             vlist *cur_c    = new vlist();
@@ -238,7 +237,8 @@ int main(int argc, const char ** argv) {
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
 
 #ifdef CLIQUE_OUT_FILE
-    cfile.open("AllClique.data");
+    std::string clique_filename = filename+".clique.data";
+    cfile.open(clique_filename);
 #endif
 
 #ifdef CLIQUE_DEBUG
