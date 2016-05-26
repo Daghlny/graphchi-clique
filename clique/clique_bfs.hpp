@@ -50,6 +50,8 @@ struct tasklist {
     }
 
     void remove_head() {
+
+        --len;
         
         if(tail == NULL && head == NULL){
             return ;

@@ -150,10 +150,12 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
 
             tasks->remove_head();
             if ( t->cand->size() == 0) {
-                /* do something about storing maximal clique in t->c */
-                #ifdef CLIQUE_OUT_FILE
-                write_clique_file(t->c, cfile);
-                #endif
+                if( t->c->size() != 0 ){
+                    /* do something about storing maximal clique in t->c */
+                    #ifdef CLIQUE_OUT_FILE
+                    write_clique_file(t->c, cfile);
+                    #endif
+                }
                 release_task(t);
                 return ;
             }
