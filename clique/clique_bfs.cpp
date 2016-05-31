@@ -4,6 +4,7 @@
 #include <set>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 #include "graphchi_basic_includes.hpp"
 #include "clique_bfs.hpp"
@@ -26,7 +27,6 @@ vlist*
 get_intsct(vlist *v1, vlist *v2){
     
     vlist *res    = new vlist();
-
     /* new version of intersect operation, time complexity is O(n+m) */
     vlist::iterator i = v1->begin(), j = v2->begin();
     while( i != v1->end() && j != v2->end() ) {
@@ -98,7 +98,7 @@ bool converged = true;
     std::ofstream cfile;
 #endif
 
-struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> {
+struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> {
     
  
     void update(graphchi_vertex<VertexDataType, EdgeDataType> &vertex, graphchi_context &gcontext) {
@@ -191,7 +191,7 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                         std::cout << "c: ";
                         print_vlist(t->c);
                         std::cout << "flag: " << t->flag << std::endl;
-                        exit();
+                        exit(0);
                     }
                     vlist *candidate = get_intsct(adjlist, t->cand);
                     vlist *c         = set_insert_copy(t->c, *iter);
