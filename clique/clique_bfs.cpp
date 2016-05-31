@@ -6,118 +6,38 @@
 #include <iostream>
 
 #include "graphchi_basic_includes.hpp"
+#include "clique_bfs.hpp"
 
 using namespace graphchi;
 
 
 #define CLIQUE_OUT_FILE
-#define CLIQUE_DEBUG
+//#define CLIQUE_DEBUG
 
 #ifdef CLIQUE_DEBUG
 std::ofstream dfile;
 #endif
 
-/**
-  * Type definitions. Remember to create suitable graph shards using the
-  * Sharder-program. 
-  */
-
-typedef std::set<vid_t> vlist;
-
-// @task_t represents a indenpendent task to compute cliques from @cand
-// @flag is the biggest index of vertices having visited
-struct task_t{
-
-    task_t( vlist *x_cand, vlist *x_c, vid_t x_flag,
-            task_t *x_pre = NULL, task_t *x_next = NULL): 
-        cand(x_cand), c(x_c), flag(x_flag), pre(x_pre), next(x_next){}
-
-    vlist   *cand;
-    vlist   *c;
-    vid_t   flag;
-    task_t  *pre;
-    task_t  *next;
-};
-
-struct tasklist {
-
-    tasklist(task_t *h, task_t *t): head(h), tail(t), len(0){}
-
-    void remove_tail() {
-        
-        --len;
-
-        if(tail == NULL && head == NULL){
-            return ;
-        } else if(tail != NULL && head != NULL && tail != head){
-            tail->pre->next = NULL;
-            tail = tail->pre;
-        } else if(tail != NULL && head != NULL && tail == head){
-            head = NULL;
-            tail = NULL;
-        } else {
-            std::cout << "Remove Error" << std::endl;
-            exit(0);
-        }
-
-    }
-
-    void remove_head() {
-        
-        if(tail == NULL && head == NULL){
-            return ;
-        } else if (tail != NULL && head != NULL && tail != head) {
-            head->next->pre = NULL;
-            head = head->next;
-        } else if (tail != NULL && head != NULL && tail == head) {
-            head = NULL;
-            tail = NULL;
-        } else {
-            std::cout << "Remove queue's head Error" << std::endl;
-            exit(0);
-        }
-    }
-
-    void insert_tail( task_t *tmp ) {
-        
-        ++len;
-
-        if( head == NULL && tail == NULL ){
-            head = tmp;
-            tail = tmp;
-            tmp->pre = NULL;
-            tmp->next = NULL;
-        } else if(head != NULL && tail != NULL){
-            tmp->pre = tail;
-            tail->next = tmp;
-            tail = tmp;
-            tmp->next = NULL;
-        } else {
-            std::cout << "Queue insert Error " << std::endl;
-            exit(0);
-        }
-
-    }
-
-    task_t *head;
-    task_t *tail;
-    size_t len;
-};
-
+long long curr_iteration_task_num;
+long long max_clique_size;
+long long clique_num;
 
 vlist* 
 get_intsct(vlist *v1, vlist *v2){
     
     vlist *res    = new vlist();
-    vlist *lo     = v1->size() > v2->size() ? v2 : v1;
-    vlist *check  = lo == v1 ? v2 : v1;
 
-    for( vlist::const_iterator iter = lo->begin();
-         iter != lo->end();
-         ++iter )
-        if( check->find(*iter) != check->end() )
-            res->insert(*iter);
-
+    /* new version of intersect operation, time complexity is O(n+m) */
+    vlist::iterator i = v1->begin(), j = v2->begin();
+    while( i != v1->end() && j != v2->end() ) {
+        if(*i < *j) i++;
+        else if (*j < *i) j++;
+        else {
+            res->insert(*i);
+            i++;
+            j++;
+        }
+    }
     return res;
 }
 
@@ -149,7 +69,7 @@ set_insert_copy( vid_t v ){
 void
 print_vlist(vlist *v){
    
-    std::cout << "clique: ";
+    std::cout << "vlist: ";
     for(vlist::iterator iter = v->begin();
         iter != v->end();
         ++iter )
@@ -157,10 +77,6 @@ print_vlist(vlist *v){
     std::cout << std::endl;
 }
 
-#ifdef CLIQUE_OUT_FILE
-    std::ofstream cfile;
-#endif
-/* this function need to be finished */
 void
 write_clique_file( vlist* clique, std::ofstream &cfile){
 
@@ -173,13 +89,15 @@ write_clique_file( vlist* clique, std::ofstream &cfile){
     cfile << std::endl;
 }
 
-typedef tasklist* VertexDataType ;
+typedef tasklist VertexDataType ;
 typedef vlist* EdgeDataType;
 
-/**
-  * GraphChi programs need to subclass GraphChiProgram<vertex-type, edge-type> 
-  * class. The main logic is usually in the update function.
-  */
+bool converged = true;
+
+#ifdef CLIQUE_OUT_FILE
+    std::ofstream cfile;
+#endif
+
 struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> {
     
  
@@ -190,42 +108,58 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
         // the insert it into task queue.
         if (gcontext.iteration == 0) {
             
-            tasklist *tmp_tlist = new tasklist(NULL, NULL);
-            vertex.set_data(tmp_tlist);
+            tasklist cur_tlist(NULL, NULL);
             vlist *cur_cand = new vlist();
             vlist *cur_c    = new vlist();
-            for( int i = 0; i != vertex.num_edges(); ++i)
-                cur_cand->insert(vertex.edge(i)->vertex_id());
+
+            vlist *all_neibors = new vlist();
+
+            for( int i = 0; i != vertex.num_edges(); ++i){
+                if( vertex.edge(i)->vertex_id() > vertex.id() )
+                    cur_cand->insert(vertex.edge(i)->vertex_id());
+                all_neibors->insert(vertex.edge(i)->vertex_id());
+            }
+
             cur_c->insert(vertex.id());
 
             task_t *first_task = new task_t( cur_cand, cur_c, vertex.id() );
-            tmp_tlist->insert_tail(first_task);
+            cur_tlist.insert_tail(first_task);
+            vertex.set_data(cur_tlist);
 
             // if @vertex.id() > neighbor.id()
             // @vertex should store its adjacency list in the edge between them
             for( int i = 0; i != vertex.num_edges(); ++i) {
                 
                 if( vertex.edge(i)->vertex_id() < vertex.id() ) {
-                    vlist *e_val = new vlist(*cur_cand);
-                    vertex.edge(i)->set_data(e_val);
+                    vertex.edge(i)->set_data(all_neibors);
                 }
             }
 
-        } else {
+            max_clique_size = 0;
+            clique_num = 0;
 
-            tasklist *tasks = vertex.get_data();
+        } else {
+            
+            tasklist *tasks = vertex.get_data_ptr();
             task_t   *t     = tasks->head;
 
             if ( t == NULL ){
                 return ;
             }
 
+            converged = false;
+
             tasks->remove_head();
             if ( t->cand->size() == 0) {
-                /* do something about storing maximal clique in t->c */
-                #ifdef CLIQUE_OUT_FILE
-                write_clique_file(t->c, cfile);
-                #endif
+                if( t->c->size() != 0 ){
+                    clique_num++;
+                    max_clique_size = std::max(max_clique_size, t->c->size());
+                    /* do something about storing maximal clique in t->c */
+                    #ifdef CLIQUE_OUT_FILE
+                    write_clique_file(t->c, cfile);
+                    #endif
+                }
+                release_task(t);
                 return ;
             }
 
@@ -247,33 +181,55 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                             break;
                         }
                     }
+
+                    if( adjlist == NULL ) {
+                        std::cout << "in current task, adjlist is NULL ";
+                        std::cout << std::endl << "info: " << std::endl;
+                        std::cout << "current vertex" << vertex.id() << std::endl;
+                        std::cout << "cand: ";
+                        print_vlist(t->cand);
+                        std::cout << "c: ";
+                        print_vlist(t->c);
+                        std::cout << "flag: " << t->flag << std::endl;
+                        exit();
+                    }
                     vlist *candidate = get_intsct(adjlist, t->cand);
-                    vlist *newc      = set_insert_copy(t->c, *iter);
+                    vlist *c         = set_insert_copy(t->c, *iter);
 
                     if (candidate->size() != 0) {
-                        task_t *tmp = new task_t(candidate, newc, *iter);
+                        task_t *tmp = new task_t(candidate, c, *iter);
                         tasks->insert_tail(tmp);
                     } else {
+                        max_clique_size = std::max(max_clique_size, t->c->size());
+                        clique_num++;
                         // output clique
                         #ifdef CLIQUE_OUT_FILE
-                        write_clique_file(newc, cfile);
+                        write_clique_file(c, cfile);
                         #endif
                         delete candidate;
-                        delete newc;
+                        delete c;
                     }
                 } // for end
             }
 
             release_task(t);
 
-
         } // else end // for iteration != 0
+        curr_iteration_task_num += vertex.get_data_ptr()->len;
     }
     
     void before_iteration(int iteration, graphchi_context &gcontext) {
+        converged = true;
+        curr_iteration_task_num = 0;
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
+        //std::cout << iteration << "  ||  " << converged << std::endl;
+        std::cout << "Remaining Tasks' number: " << curr_iteration_task_num;
+        std::cout << std::endl;
+        if(converged && iteration != 0){
+            gcontext.set_last_iteration(iteration);
+        }
     }
     
     void before_exec_interval(vid_t window_st, vid_t window_en, graphchi_context &gcontext) {        
@@ -295,11 +251,12 @@ int main(int argc, const char ** argv) {
     
     /* Basic arguments for application */
     std::string filename = get_option_string("file");  // Base filename
-    int niters           = get_option_int("niters", 4); // Number of iterations
+    int niters           = get_option_int("niters", 1000000); // Number of iterations
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
 
 #ifdef CLIQUE_OUT_FILE
-    cfile.open("AllClique.data");
+    std::string clique_filename = filename+".clique.data";
+    file.open(clique_filename.c_str());
 #endif
 
 #ifdef CLIQUE_DEBUG
@@ -317,6 +274,10 @@ int main(int argc, const char ** argv) {
     
     /* Report execution metrics */
     metrics_report(m);
+    
+    std::cout << "Total clique number: " << clique_num << std::endl;
+    std::cout << "Maximum clique's size: " << max_clique_size << std::endl;
+
 #ifdef CLIQUE_OUT_FILE
     cfile.close();
 #endif
