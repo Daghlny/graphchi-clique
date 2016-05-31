@@ -19,6 +19,8 @@ std::ofstream dfile;
 #endif
 
 long long curr_iteration_task_num;
+long long max_clique_size;
+long long clique_num;
 
 vlist* 
 get_intsct(vlist *v1, vlist *v2){
@@ -133,6 +135,9 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                 }
             }
 
+            max_clique_size = 0;
+            clique_num = 0;
+
         } else {
             
             tasklist *tasks = vertex.get_data_ptr();
@@ -147,6 +152,8 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
             tasks->remove_head();
             if ( t->cand->size() == 0) {
                 if( t->c->size() != 0 ){
+                    clique_num++;
+                    max_clique_size = std::max(max_clique_size, t->c->size());
                     /* do something about storing maximal clique in t->c */
                     #ifdef CLIQUE_OUT_FILE
                     write_clique_file(t->c, cfile);
@@ -193,6 +200,8 @@ struct MyGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> 
                         task_t *tmp = new task_t(candidate, c, *iter);
                         tasks->insert_tail(tmp);
                     } else {
+                        max_clique_size = std::max(max_clique_size, t->c->size());
+                        clique_num++;
                         // output clique
                         #ifdef CLIQUE_OUT_FILE
                         write_clique_file(c, cfile);
@@ -265,6 +274,10 @@ int main(int argc, const char ** argv) {
     
     /* Report execution metrics */
     metrics_report(m);
+    
+    std::cout << "Total clique number: " << clique_num << std::endl;
+    std::cout << "Maximum clique's size: " << max_clique_size << std::endl;
+
 #ifdef CLIQUE_OUT_FILE
     cfile.close();
 #endif
