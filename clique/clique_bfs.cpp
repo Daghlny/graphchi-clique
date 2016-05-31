@@ -19,9 +19,9 @@ using namespace graphchi;
 std::ofstream dfile;
 #endif
 
-long long curr_iteration_task_num;
-long long max_clique_size;
-long long clique_num;
+uint64_t  curr_iteration_task_num;
+uint64_t  max_clique_size;
+uint64_t  clique_num;
 
 vlist* 
 get_intsct(vlist *v1, vlist *v2){
@@ -256,7 +256,7 @@ int main(int argc, const char ** argv) {
 
 #ifdef CLIQUE_OUT_FILE
     std::string clique_filename = filename+".clique.data";
-    file.open(clique_filename.c_str());
+    cfile.open(clique_filename.c_str());
 #endif
 
 #ifdef CLIQUE_DEBUG
@@ -268,7 +268,7 @@ int main(int argc, const char ** argv) {
                                                             get_option_string("nshards", "auto"));
     
     /* Run */
-    MyGraphChiProgram program;
+    CliqueGraphChiProgram program;
     graphchi_engine<VertexDataType, EdgeDataType> engine(filename, nshards, scheduler, m); 
     engine.run(program, niters);
     
