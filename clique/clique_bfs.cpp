@@ -115,8 +115,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
             vlist *all_neibors = new vlist();
 
             for( int i = 0; i != vertex.num_edges(); ++i){
-                if( vertex.edge(i)->vertex_id() > vertex.id() )
-                    cur_cand->insert(vertex.edge(i)->vertex_id());
+                
+                cur_cand->insert(vertex.edge(i)->vertex_id());
                 all_neibors->insert(vertex.edge(i)->vertex_id());
             }
 
@@ -225,7 +225,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
         //std::cout << iteration << "  ||  " << converged << std::endl;
-        std::cout << "Remaining Tasks' number: " << curr_iteration_task_num;
+        std::cout << curr_iteration_task_num;
         std::cout << std::endl;
         if(converged && iteration != 0){
             gcontext.set_last_iteration(iteration);
@@ -255,7 +255,7 @@ int main(int argc, const char ** argv) {
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
 
 #ifdef CLIQUE_OUT_FILE
-    std::string clique_filename = filename+".clique.data";
+    std::string clique_filename = filename+".graphchi.clique";
     cfile.open(clique_filename.c_str());
 #endif
 
