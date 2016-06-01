@@ -4,6 +4,7 @@
 #include <set>
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
 #include <algorithm>
 
 #include "graphchi_basic_includes.hpp"
@@ -153,6 +154,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
             if ( t->cand->size() == 0) {
                 if( t->c->size() != 0 ){
                     clique_num++;
+                    //if(t->c->size() > 6) getchar();
                     max_clique_size = std::max(max_clique_size, t->c->size());
                     /* do something about storing maximal clique in t->c */
                     #ifdef CLIQUE_OUT_FILE
@@ -168,6 +170,14 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                 for( vlist::iterator iter = t->cand->begin();
                      iter != t->cand->end();
                      ++iter) {
+                    
+                    // the codes below just for debug
+                    /*
+                    if( *iter > 500 ) {
+                        std::cout << "*iter: " << *iter << std::endl;
+                        getchar();
+                    }
+                    */
 
                     if ( *iter < t->flag ) continue;
 
@@ -200,7 +210,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                         task_t *tmp = new task_t(candidate, c, *iter);
                         tasks->insert_tail(tmp);
                     } else {
-                        max_clique_size = std::max(max_clique_size, t->c->size());
+                        max_clique_size = std::max(max_clique_size, c->size());
                         clique_num++;
                         // output clique
                         #ifdef CLIQUE_OUT_FILE
