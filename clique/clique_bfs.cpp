@@ -257,11 +257,11 @@ int main(int argc, const char ** argv) {
     
     /* Metrics object for keeping track of performance counters
        and other information. Currently required. */
-    metrics m("my-application-name");
+    metrics m("Maximal Cliques Enumeration");
     
     /* Basic arguments for application */
     std::string filename = get_option_string("file");  // Base filename
-    int niters           = get_option_int("niters", 1000000); // Number of iterations
+    int niters           = get_option_int("niters", 1000000000); // Number of iterations
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
 
 #ifdef CLIQUE_OUT_FILE
