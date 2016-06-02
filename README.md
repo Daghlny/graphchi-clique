@@ -1,6 +1,6 @@
 # graphchi-clique:
 
-#use GraphChi engine to compute maximal cliques from a graph.
+## use GraphChi engine to compute maximal cliques from a graph.
 
 ### Getting Started
 
