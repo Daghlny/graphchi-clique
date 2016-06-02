@@ -4,13 +4,13 @@
 
 ### Getting Started
 
-compile your clique program: ** make clique/clique_bfs **
+compile your clique program: **make clique/clique_bfs**
 
-to compute your graph: ** clique/clique_bfs file YourGraphDataFile
+to compute your graph: **clique/clique_bfs file YourGraphDataFile**
 
 maybe the engine will ask you which file type of your data file, such as *edgelist* , *adjlist*.
 
 
 
-** This Program is based on [GraphChi](https://github.com/GraphChi/graphchi-cpp/), Thanks for their work. **
+**This Program is based on [GraphChi](https://github.com/GraphChi/graphchi-cpp/), Thanks for their work.**
 
