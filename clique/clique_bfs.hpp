@@ -26,6 +26,7 @@ struct task_t{
     task_t  *next;
 };
 
+/* the task's queue */
 struct tasklist {
 
     tasklist(task_t *h, task_t *t): head(h), tail(t), len(0){}

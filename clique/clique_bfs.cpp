@@ -24,6 +24,7 @@ uint64_t  curr_iteration_task_num;
 uint64_t  max_clique_size;
 uint64_t  clique_num;
 
+/* compute the intersection of two sets */
 vlist* 
 get_intsct(vlist *v1, vlist *v2){
     
@@ -42,6 +43,7 @@ get_intsct(vlist *v1, vlist *v2){
     return res;
 }
 
+/* release the memory of a task */
 void
 release_task(task_t *t){
    
@@ -50,6 +52,7 @@ release_task(task_t *t){
     delete t;
 }
 
+/* return a new set containing the set @vl and the vertex @v */
 vlist*
 set_insert_copy( vlist* vl, vid_t v){
     
@@ -58,6 +61,7 @@ set_insert_copy( vlist* vl, vid_t v){
     return res;
 }
 
+/* return a new set only containing a vertex @v */
 vlist*
 set_insert_copy( vid_t v ){
     
@@ -78,6 +82,7 @@ print_vlist(vlist *v){
     std::cout << std::endl;
 }
 
+/* write the clique's vertex into the file @cfile */
 void
 write_clique_file( vlist* clique, std::ofstream &cfile){
 
@@ -106,7 +111,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
         // Initialize the task queue of every @vertex
         // Construct a new task that contains all @vertex's neighbors
-        // the insert it into task queue.
+        // then insert it into task queue.
         if (gcontext.iteration == 0) {
             
             tasklist cur_tlist(NULL, NULL);
@@ -154,9 +159,9 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
             if ( t->cand->size() == 0) {
                 if( t->c->size() != 0 ){
                     clique_num++;
-                    //if(t->c->size() > 6) getchar();
                     max_clique_size = std::max(max_clique_size, t->c->size());
-                    /* do something about storing maximal clique in t->c */
+
+                    /* output maximal clique in t->c */
                     #ifdef CLIQUE_OUT_FILE
                     write_clique_file(t->c, cfile);
                     #endif
@@ -171,14 +176,6 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                      iter != t->cand->end();
                      ++iter) {
                     
-                    // the codes below just for debug
-                    /*
-                    if( *iter > 500 ) {
-                        std::cout << "*iter: " << *iter << std::endl;
-                        getchar();
-                    }
-                    */
-
                     if ( *iter < t->flag ) continue;
 
                     /* Add New Task */
@@ -234,9 +231,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
-        //std::cout << iteration << "  ||  " << converged << std::endl;
-        std::cout << curr_iteration_task_num;
-        std::cout << std::endl;
+        /* output remaining task's number */
+        std::cout << curr_iteration_task_num << std::endl;
         if(converged && iteration != 0){
             gcontext.set_last_iteration(iteration);
         }
@@ -269,10 +265,6 @@ int main(int argc, const char ** argv) {
     cfile.open(clique_filename.c_str());
 #endif
 
-#ifdef CLIQUE_DEBUG
-    dfile.open("debug.log");
-#endif
-
     /* Detect the number of shards or preprocess an input to create them */
     int nshards          = convert_if_notexists<EdgeDataType>(filename, 
                                                             get_option_string("nshards", "auto"));
@@ -290,10 +282,6 @@ int main(int argc, const char ** argv) {
 
 #ifdef CLIQUE_OUT_FILE
     cfile.close();
-#endif
-
-#ifdef CLIQUE_DEBUG
-    dfile.close();
 #endif
 
     return 0;
