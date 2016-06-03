@@ -533,7 +533,7 @@ namespace graphchi {
             work = nupdates = 0;
             
             for(iter=0; iter<niters; iter++) {
-                logstream(LOG_INFO) << "In-memory mode: Iteration " << iter << " starts. (" << chicontext.runtime() << " secs)" << std::endl;
+                //logstream(LOG_INFO) << "In-memory mode: Iteration " << iter << " starts. (" << chicontext.runtime() << " secs)" << std::endl;
                 chicontext.iteration = iter;
                 if (iter > 0) // First one run before -- ugly
                     userprogram.before_iteration(iter, chicontext);
