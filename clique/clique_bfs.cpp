@@ -232,7 +232,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
         /* output remaining task's number */
-        std::cout << curr_iteration_task_num << std::endl;
+        //std::cout << curr_iteration_task_num << std::endl;
         if(converged && iteration != 0){
             gcontext.set_last_iteration(iteration);
         }
