@@ -453,6 +453,72 @@ namespace graphchi {
             m.stop_time(me, "execute-updates");
         }
         
+		virtual void exec_updates_in_parallel(GraphChiProgram<VertexDataType, EdgeDataType, svertex_t> &userprogram,
+                          std::vector<svertex_t> &vertices) {
+            metrics_entry me = m.start_time();
+            //size_t nvertices = vertices.size();
+			/*
+            if (!enable_deterministic_parallelism) {
+                for(int i=0; i < (int)nvertices; i++) vertices[i].parallel_safe = true;
+            }
+			*/
+            int sub_interval_len = sub_interval_en - sub_interval_st;
+
+            std::vector<vid_t> random_order(randomization ? sub_interval_len + 1 : 0);
+            if (randomization) {
+                // Randomize vertex-vector
+                for(int idx=0; idx <= (int)sub_interval_len; idx++) random_order[idx] = idx;
+                std::random_shuffle(random_order.begin(), random_order.end());
+            }
+             
+            do {
+                omp_set_num_threads(exec_threads);
+       	/*         
+        #pragma omp parallel sections 
+                    {
+        #pragma omp section
+                        {
+		*/
+        //#pragma omp parallel for schedule(static)
+        #pragma omp parallel for
+                        for(int idx=0; idx <= (int)sub_interval_len; idx++) {
+                                vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
+                                svertex_t & v = vertices[vid - sub_interval_st];
+                                
+                                //if (exec_threads == 1 || v.parallel_safe) {
+                                if (true) {
+                                    //if (!disable_vertexdata_storage)
+                                        v.dataptr = vertex_data_handler->vertex_data_ptr(vid);
+                                    //if (v.scheduled) 
+                                        userprogram.update(v, chicontext);
+                                }
+                            }
+                        //}
+						/*
+        #pragma omp section
+                        {
+                            if (exec_threads > 1 && enable_deterministic_parallelism) {
+                                int nonsafe_count = 0;
+                                for(int idx=0; idx <= (int)sub_interval_len; idx++) {
+                                    vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
+                                    svertex_t & v = vertices[vid - sub_interval_st];
+                                    if (!v.parallel_safe && v.scheduled) {
+                                        if (!disable_vertexdata_storage)
+                                            v.dataptr = vertex_data_handler->vertex_data_ptr(vid);
+                                        userprogram.update(v, chicontext);
+                                        nonsafe_count++;
+                                    }
+                                }
+                                
+                                m.add("serialized-updates", nonsafe_count);
+                            }
+                        }
+						*/
+                //}
+            } while (userprogram.repeat_updates(chicontext));
+            
+            m.stop_time(me, "execute-updates");
+        }
 
         /**
          Special method for running all iterations with the same vertex-vector.
@@ -507,9 +573,12 @@ namespace graphchi {
                 }
                 
                 m.start_time("inmem-exec");
-                
-                exec_updates(userprogram, vertices);
-                
+				//specially modified for clique :)
+               	if(iter > 0){
+                	exec_updates_in_parallel(userprogram, vertices);
+				}else{ 
+                	exec_updates(userprogram, vertices);
+               	} 
                 m.stop_time("inmem-exec");
                 
                 load_after_updates(vertices);
@@ -526,8 +595,19 @@ namespace graphchi {
             if (save_edgesfiles_after_inmemmode) {
                 logstream(LOG_INFO) << "Saving memory shard..." << std::endl;
                 
-            }
-        }
+			}
+			////////////
+			int sp = get_option_int("sp", 0);
+				if(sp != 0){
+					vid_t se_sum = 0;
+					for(vid_t i=0; i<vertices.size(); i++){
+						if(!vertices[i].parallel_safe)	
+							se_sum++;
+					}
+					std::cout<<"serialized vertices: "<<se_sum << "\t total: "<<vertices.size()<<"\t ratio: "<<(float)se_sum/vertices.size()
+						<<"-------------------------------------"<<std::endl;
+				}
+		}
         
 
         virtual void init_vertices(std::vector<svertex_t> &vertices, graphchi_edge<EdgeDataType> * &edata) {
