@@ -482,6 +482,8 @@ namespace graphchi {
         //#pragma omp parallel for schedule(static)
         #pragma omp parallel for
                         for(int idx=0; idx <= (int)sub_interval_len; idx++) {
+                                
+                            std::cout << "***" << idx << "***" << std::endl;
                                 vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
                                 svertex_t & v = vertices[vid - sub_interval_st];
                                 
