@@ -23,6 +23,7 @@ std::ofstream dfile;
 uint64_t  curr_iteration_task_num;
 uint64_t  max_clique_size;
 uint64_t  clique_num;
+int       task_per_iter;
 
 /* compute the intersection of two sets */
 vlist* 
@@ -146,80 +147,84 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
         } else {
             
-            tasklist *tasks = vertex.get_data_ptr();
-            task_t   *t     = tasks->head;
+            // In this iteration, every vertex should process @task_per_iter tasks;
+            for(int i = 0; i != task_per_iter; ++i){
 
-            if ( t == NULL ){
-                return ;
-            }
+                tasklist *tasks = vertex.get_data_ptr();
+                task_t   *t     = tasks->head;
 
-            converged = false;
-
-            tasks->remove_head();
-            if ( t->cand->size() == 0) {
-                if( t->c->size() != 0 ){
-                    clique_num++;
-                    max_clique_size = std::max(max_clique_size, t->c->size());
-
-                    /* output maximal clique in t->c */
-                    #ifdef CLIQUE_OUT_FILE
-                    write_clique_file(t->c, cfile);
-                    #endif
+                if ( t == NULL ){
+                    return ;
                 }
-                release_task(t);
-                return ;
-            }
 
-            if ( t->cand->size() != 0 ) {
-                
-                for( vlist::iterator iter = t->cand->begin();
-                     iter != t->cand->end();
-                     ++iter) {
-                    
-                    if ( *iter < t->flag ) continue;
+                converged = false;
 
-                    /* Add New Task */
-                    // First, construct two necessary vertex sets
-                    // Second, if candidate set is empty, c is a MC
-                    vlist *adjlist = NULL;
-                    for( int i = 0; i != vertex.num_edges(); ++i ){
-                        if (vertex.edge(i)->vertex_id() == *iter){ 
-                            adjlist = vertex.edge(i)->get_data();
-                            break;
-                        }
-                    }
-
-                    if( adjlist == NULL ) {
-                        std::cout << "in current task, adjlist is NULL ";
-                        std::cout << std::endl << "info: " << std::endl;
-                        std::cout << "current vertex" << vertex.id() << std::endl;
-                        std::cout << "cand: ";
-                        print_vlist(t->cand);
-                        std::cout << "c: ";
-                        print_vlist(t->c);
-                        std::cout << "flag: " << t->flag << std::endl;
-                        exit(0);
-                    }
-                    vlist *candidate = get_intsct(adjlist, t->cand);
-                    vlist *c         = set_insert_copy(t->c, *iter);
-
-                    if (candidate->size() != 0) {
-                        task_t *tmp = new task_t(candidate, c, *iter);
-                        tasks->insert_tail(tmp);
-                    } else {
-                        max_clique_size = std::max(max_clique_size, c->size());
+                tasks->remove_head();
+                if ( t->cand->size() == 0) {
+                    if( t->c->size() != 0 ){
                         clique_num++;
-                        // output clique
-                        #ifdef CLIQUE_OUT_FILE
-                        write_clique_file(c, cfile);
-                        #endif
-                        delete candidate;
-                        delete c;
-                    }
-                } // for end
-            }
+                        max_clique_size = std::max(max_clique_size, t->c->size());
 
-            release_task(t);
+                        /* output maximal clique in t->c */
+                        #ifdef CLIQUE_OUT_FILE
+                        write_clique_file(t->c, cfile);
+                        #endif
+                    }
+                    release_task(t);
+                    return ;
+                }
+
+                if ( t->cand->size() != 0 ) {
+                    
+                    for( vlist::iterator iter = t->cand->begin();
+                         iter != t->cand->end();
+                         ++iter) {
+                        
+                        if ( *iter < t->flag ) continue;
+
+                        /* Add New Task */
+                        // First, construct two necessary vertex sets
+                        // Second, if candidate set is empty, c is a MC
+                        vlist *adjlist = NULL;
+                        for( int i = 0; i != vertex.num_edges(); ++i ){
+                            if (vertex.edge(i)->vertex_id() == *iter){ 
+                                adjlist = vertex.edge(i)->get_data();
+                                break;
+                            }
+                        }
+
+                        if( adjlist == NULL ) {
+                            std::cout << "in current task, adjlist is NULL ";
+                            std::cout << std::endl << "info: " << std::endl;
+                            std::cout << "current vertex" << vertex.id() << std::endl;
+                            std::cout << "cand: ";
+                            print_vlist(t->cand);
+                            std::cout << "c: ";
+                            print_vlist(t->c);
+                            std::cout << "flag: " << t->flag << std::endl;
+                            exit(0);
+                        }
+                        vlist *candidate = get_intsct(adjlist, t->cand);
+                        vlist *c         = set_insert_copy(t->c, *iter);
+
+                        if (candidate->size() != 0) {
+                            task_t *tmp = new task_t(candidate, c, *iter);
+                            tasks->insert_tail(tmp);
+                        } else {
+                            max_clique_size = std::max(max_clique_size, c->size());
+                            clique_num++;
+                            // output clique
+                            #ifdef CLIQUE_OUT_FILE
+                            write_clique_file(c, cfile);
+                            #endif
+                            delete candidate;
+                            delete c;
+                        }
+                    } // for end
+                }
+
+                release_task(t);
+            }
 
         } // else end // for iteration != 0
         curr_iteration_task_num += vertex.get_data_ptr()->len;
@@ -259,6 +264,7 @@ int main(int argc, const char ** argv) {
     std::string filename = get_option_string("file");  // Base filename
     int niters           = get_option_int("niters", 1000000000); // Number of iterations
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
+    task_per_iter        = get_option_int("taskPerIter", 10);// get the task's number of each iteration
 
 #ifdef CLIQUE_OUT_FILE
     std::string clique_filename = filename+".graphchi.clique";
