@@ -278,6 +278,7 @@ int main(int argc, const char ** argv) {
     /* Run */
     CliqueGraphChiProgram program;
     graphchi_engine<VertexDataType, EdgeDataType> engine(filename, nshards, scheduler, m); 
+    engine.set_enable_deterministic_parallelism(false);
     engine.run(program, niters);
     
     /* Report execution metrics */
