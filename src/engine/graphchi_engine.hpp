@@ -483,17 +483,17 @@ namespace graphchi {
         #pragma omp parallel for
                         for(int idx=0; idx <= (int)sub_interval_len; idx++) {
                                 
-                            std::cout << "***" << idx << "***" << std::endl;
+                                //std::cout << "***" << idx << "***" << std::endl;
                                 vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
                                 svertex_t & v = vertices[vid - sub_interval_st];
                                 
                                 //if (exec_threads == 1 || v.parallel_safe) {
-                                if (true) {
+                                //if (true) {
                                     //if (!disable_vertexdata_storage)
-                                        v.dataptr = vertex_data_handler->vertex_data_ptr(vid);
+                                v.dataptr = vertex_data_handler->vertex_data_ptr(vid);
                                     //if (v.scheduled) 
-                                        userprogram.update(v, chicontext);
-                                }
+                                userprogram.update(v, chicontext);
+                                //}
                             }
                         //}
 						/*
