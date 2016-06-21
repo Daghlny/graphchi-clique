@@ -473,50 +473,18 @@ namespace graphchi {
              
             do {
                 omp_set_num_threads(exec_threads);
-       	/*         
-        #pragma omp parallel sections 
-                    {
-        #pragma omp section
-                        {
-		*/
-        //#pragma omp parallel for schedule(static)
-        #pragma omp parallel for
-                        for(int idx=0; idx <= (int)sub_interval_len; idx++) {
+            //#pragma omp parallel
+            //{
+            #pragma omp for schedule(dynamic) nowait
+                for(int idx=0; idx <= (int)sub_interval_len; idx++) {
                                 
-                                //std::cout << "***" << idx << "***" << std::endl;
-                                vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
-                                svertex_t & v = vertices[vid - sub_interval_st];
-                                
-                                //if (exec_threads == 1 || v.parallel_safe) {
-                                //if (true) {
-                                    //if (!disable_vertexdata_storage)
-                                v.dataptr = vertex_data_handler->vertex_data_ptr(vid);
-                                    //if (v.scheduled) 
-                                userprogram.update(v, chicontext);
-                                //}
-                            }
-                        //}
-						/*
-        #pragma omp section
-                        {
-                            if (exec_threads > 1 && enable_deterministic_parallelism) {
-                                int nonsafe_count = 0;
-                                for(int idx=0; idx <= (int)sub_interval_len; idx++) {
-                                    vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
-                                    svertex_t & v = vertices[vid - sub_interval_st];
-                                    if (!v.parallel_safe && v.scheduled) {
-                                        if (!disable_vertexdata_storage)
-                                            v.dataptr = vertex_data_handler->vertex_data_ptr(vid);
-                                        userprogram.update(v, chicontext);
-                                        nonsafe_count++;
-                                    }
-                                }
-                                
-                                m.add("serialized-updates", nonsafe_count);
-                            }
-                        }
-						*/
-                //}
+                    vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
+                    svertex_t & v = vertices[vid - sub_interval_st];
+                    v.dataptr = vertex_data_handler->vertex_data_ptr(vid);
+                    userprogram.update(v, chicontext);
+
+                }
+            //}
             } while (userprogram.repeat_updates(chicontext));
             
             m.stop_time(me, "execute-updates");
