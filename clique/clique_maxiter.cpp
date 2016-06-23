@@ -16,10 +16,6 @@ using namespace graphchi;
 #define CLIQUE_OUT_FILE
 //#define CLIQUE_DEBUG
 
-#ifdef CLIQUE_DEBUG
-std::ofstream dfile;
-#endif
-
 //uint64_t  curr_iteration_task_num;
 //uint64_t  max_clique_size;
 //uint64_t  clique_num;
@@ -267,10 +263,10 @@ int main(int argc, const char ** argv) {
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
     //task_per_iter        = get_option_int("taskPerIter", 10);// get the task's number of each iteration
 
-#ifdef CLIQUE_OUT_FILE
-    std::string clique_filename = filename+".graphchi.clique";
-    cfile.open(clique_filename.c_str());
-#endif
+//#ifdef CLIQUE_OUT_FILE
+//    std::string clique_filename = filename+".graphchi.clique";
+//    cfile.open(clique_filename.c_str());
+//#endif
 
     /* Detect the number of shards or preprocess an input to create them */
     int nshards          = convert_if_notexists<EdgeDataType>(filename, 
@@ -287,9 +283,9 @@ int main(int argc, const char ** argv) {
     //std::cout << "Total clique number: " << clique_num << std::endl;
     //std::cout << "Maximum clique's size: " << max_clique_size << std::endl;
 
-#ifdef CLIQUE_OUT_FILE
-    cfile.close();
-#endif
+//#ifdef CLIQUE_OUT_FILE
+//    cfile.close();
+//#endif
 
     return 0;
 }
