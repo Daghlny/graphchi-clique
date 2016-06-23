@@ -234,10 +234,9 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
     void after_iteration(int iteration, graphchi_context &gcontext) {
         /* output remaining task's number */
         //std::cout << curr_iteration_task_num << std::endl;
-        /*if(converged && iteration != 0){
-            gcontext.set_last_iteration(iteration);
-        }
-        */
+        //if(converged && iteration != 0){
+        gcontext.set_last_iteration(10);
+        //}
     }
     
     void before_exec_interval(vid_t window_st, vid_t window_en, graphchi_context &gcontext) {        
