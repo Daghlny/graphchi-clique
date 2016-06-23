@@ -99,7 +99,7 @@ write_clique_file( vlist* clique, std::ofstream &cfile){
 typedef tasklist VertexDataType ;
 typedef vlist* EdgeDataType;
 
-bool converged = true;
+//bool converged = true;
 
 #ifdef CLIQUE_OUT_FILE
     std::ofstream cfile;
@@ -157,7 +157,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                     return ;
                 }
 
-                converged = false;
+                //converged = false;
 
                 tasks->remove_head();
                 if ( t->cand->size() == 0) {
@@ -167,7 +167,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
                         /* output maximal clique in t->c */
                         #ifdef CLIQUE_OUT_FILE
-                        write_clique_file(t->c, cfile);
+                        //write_clique_file(t->c, cfile);
                         #endif
                     }
                     release_task(t);
@@ -215,7 +215,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                             //clique_num++;
                             // output clique
                             #ifdef CLIQUE_OUT_FILE
-                            write_clique_file(c, cfile);
+                            //write_clique_file(c, cfile);
                             #endif
                             delete candidate;
                             delete c;
@@ -231,16 +231,17 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
     }
     
     void before_iteration(int iteration, graphchi_context &gcontext) {
-        converged = true;
+        //converged = true;
         //curr_iteration_task_num = 0;
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
         /* output remaining task's number */
         //std::cout << curr_iteration_task_num << std::endl;
-        if(converged && iteration != 0){
+        /*if(converged && iteration != 0){
             gcontext.set_last_iteration(iteration);
         }
+        */
     }
     
     void before_exec_interval(vid_t window_st, vid_t window_en, graphchi_context &gcontext) {        
