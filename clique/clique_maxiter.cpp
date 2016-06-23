@@ -20,10 +20,10 @@ using namespace graphchi;
 std::ofstream dfile;
 #endif
 
-uint64_t  curr_iteration_task_num;
-uint64_t  max_clique_size;
-uint64_t  clique_num;
-int       task_per_iter;
+//uint64_t  curr_iteration_task_num;
+//uint64_t  max_clique_size;
+//uint64_t  clique_num;
+//int       task_per_iter;
 
 /* compute the intersection of two sets */
 vlist* 
@@ -142,8 +142,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                 }
             }
 
-            max_clique_size = 0;
-            clique_num = 0;
+            //max_clique_size = 0;
+            //clique_num = 0;
 
         } else {
             
@@ -162,8 +162,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                 tasks->remove_head();
                 if ( t->cand->size() == 0) {
                     if( t->c->size() != 0 ){
-                        clique_num++;
-                        max_clique_size = std::max(max_clique_size, t->c->size());
+                        //clique_num++;
+                        //max_clique_size = std::max(max_clique_size, t->c->size());
 
                         /* output maximal clique in t->c */
                         #ifdef CLIQUE_OUT_FILE
@@ -211,8 +211,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                             task_t *tmp = new task_t(candidate, c, *iter);
                             tasks->insert_tail(tmp);
                         } else {
-                            max_clique_size = std::max(max_clique_size, c->size());
-                            clique_num++;
+                            //max_clique_size = std::max(max_clique_size, c->size());
+                            //clique_num++;
                             // output clique
                             #ifdef CLIQUE_OUT_FILE
                             write_clique_file(c, cfile);
@@ -227,12 +227,12 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
             }
 
         } // else end // for iteration != 0
-        curr_iteration_task_num += vertex.get_data_ptr()->len;
+        //curr_iteration_task_num += vertex.get_data_ptr()->len;
     }
     
     void before_iteration(int iteration, graphchi_context &gcontext) {
         converged = true;
-        curr_iteration_task_num = 0;
+        //curr_iteration_task_num = 0;
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
@@ -283,8 +283,8 @@ int main(int argc, const char ** argv) {
     /* Report execution metrics */
     metrics_report(m);
     
-    std::cout << "Total clique number: " << clique_num << std::endl;
-    std::cout << "Maximum clique's size: " << max_clique_size << std::endl;
+    //std::cout << "Total clique number: " << clique_num << std::endl;
+    //std::cout << "Maximum clique's size: " << max_clique_size << std::endl;
 
 #ifdef CLIQUE_OUT_FILE
     cfile.close();
