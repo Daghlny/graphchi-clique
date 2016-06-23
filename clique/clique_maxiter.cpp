@@ -101,9 +101,9 @@ typedef vlist* EdgeDataType;
 
 //bool converged = true;
 
-#ifdef CLIQUE_OUT_FILE
-    std::ofstream cfile;
-#endif
+//#ifdef CLIQUE_OUT_FILE
+//    std::ofstream cfile;
+//#endif
 
 struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataType> {
     
