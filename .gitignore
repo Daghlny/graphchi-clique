@@ -4,6 +4,7 @@ tags
 clique/clique
 clique/*.out
 *.data
+*.perf.data
 
 # Compiled Object files
 *.slo

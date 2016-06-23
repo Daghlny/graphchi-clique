@@ -473,6 +473,8 @@ namespace graphchi {
              
             do {
                 omp_set_num_threads(exec_threads);
+                // for debugging
+                std::cout << "enter the OpenMP section" << std::endl;
             //#pragma omp parallel
             //{
             #pragma omp for schedule(dynamic) nowait
