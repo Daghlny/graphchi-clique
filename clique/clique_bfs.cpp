@@ -1,5 +1,4 @@
 
-
 #include <string>
 #include <set>
 #include <fstream>
@@ -11,7 +10,6 @@
 #include "clique_bfs.hpp"
 
 using namespace graphchi;
-
 
 #define CLIQUE_OUT_FILE
 //#define CLIQUE_DEBUG
@@ -194,9 +192,10 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                         }
 
                         if( adjlist == NULL ) {
-                            std::cout << "in current task, adjlist is NULL ";
-                            std::cout << std::endl << "info: " << std::endl;
-                            std::cout << "current vertex" << vertex.id() << std::endl;
+                            std::cout << "Runtime Error: "; 
+                            std::cout << "in current task, adjlist is NULL \n";
+                            std::cout << "current vertex: " << vertex.id() ;
+                            std::cout << std::endl;
                             std::cout << "cand: ";
                             print_vlist(t->cand);
                             std::cout << "c: ";
@@ -204,6 +203,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                             std::cout << "flag: " << t->flag << std::endl;
                             exit(0);
                         }
+
                         vlist *candidate = get_intsct(adjlist, t->cand);
                         vlist *c         = set_insert_copy(t->c, *iter);
 
