@@ -471,9 +471,14 @@ namespace graphchi {
                 std::random_shuffle(random_order.begin(), random_order.end());
             }
              
-            do {
+            //do {
                 omp_set_num_threads(exec_threads);
+<<<<<<< HEAD
                 std::cout << exec_threads << std::endl;
+=======
+                // for debugging
+            std::cout << "enter the OpenMP section ";
+>>>>>>> ed18387bda0816d5c5b69267657c5cce50d45961
             //#pragma omp parallel
             //{
             #pragma omp parallel for schedule(dynamic) nowait
@@ -486,7 +491,7 @@ namespace graphchi {
 
                 }
             //}
-            } while (userprogram.repeat_updates(chicontext));
+            //} while (userprogram.repeat_updates(chicontext));
             
             m.stop_time(me, "execute-updates");
         }
@@ -501,6 +506,8 @@ namespace graphchi {
          **/
         virtual void exec_updates_inmemory_mode(GraphChiProgram<VertexDataType, EdgeDataType, svertex_t> &userprogram,
                                         std::vector<svertex_t> &vertices) {
+
+            std::cout << "enter the inmemory mode" << std::endl;
             work = nupdates = 0;
             
             for(iter=0; iter<niters; iter++) {
@@ -550,6 +557,7 @@ namespace graphchi {
 				}else{ 
                 	exec_updates(userprogram, vertices);
                	} 
+
                 m.stop_time("inmem-exec");
                 
                 load_after_updates(vertices);
@@ -828,6 +836,7 @@ namespace graphchi {
             
             /* Main loop */
             for(iter=0; iter < niters; iter++) {
+                std::cout << iter << std::endl;
                 logstream(LOG_INFO) << "Start iteration: " << iter << std::endl;
                 
                 initialize_iter();

@@ -5,6 +5,7 @@ clique/clique
 clique/*.out
 *.data
 result/*
+*.perf.data
 
 # Compiled Object files
 *.slo
