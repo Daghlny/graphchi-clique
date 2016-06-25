@@ -473,15 +473,9 @@ namespace graphchi {
              
             //do {
                 omp_set_num_threads(exec_threads);
-<<<<<<< HEAD
-                std::cout << exec_threads << std::endl;
-=======
-                // for debugging
-            std::cout << "enter the OpenMP section ";
->>>>>>> ed18387bda0816d5c5b69267657c5cce50d45961
             //#pragma omp parallel
             //{
-            #pragma omp parallel for schedule(dynamic) nowait
+            #pragma omp parallel for schedule(dynamic)
                 for(int idx=0; idx <= (int)sub_interval_len; idx++) {
                                 
                     vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
@@ -836,7 +830,7 @@ namespace graphchi {
             
             /* Main loop */
             for(iter=0; iter < niters; iter++) {
-                std::cout << iter << std::endl;
+                //std::cout << iter << std::endl;
                 logstream(LOG_INFO) << "Start iteration: " << iter << std::endl;
                 
                 initialize_iter();
