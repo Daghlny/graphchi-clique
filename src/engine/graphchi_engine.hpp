@@ -473,9 +473,10 @@ namespace graphchi {
              
             do {
                 omp_set_num_threads(exec_threads);
+                std::cout << exec_threads << std::endl;
             //#pragma omp parallel
             //{
-            #pragma omp for schedule(dynamic) nowait
+            #pragma omp parallel for schedule(dynamic) nowait
                 for(int idx=0; idx <= (int)sub_interval_len; idx++) {
                                 
                     vid_t vid = sub_interval_st + (randomization ? random_order[idx] : idx);
