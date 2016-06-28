@@ -6,6 +6,8 @@ clique/*.out
 *.data
 result/*
 *.perf.data
+perf.data
+*.perf.data.old
 
 # Compiled Object files
 *.slo

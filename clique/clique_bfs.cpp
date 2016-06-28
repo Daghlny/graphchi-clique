@@ -165,7 +165,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
                         /* output maximal clique in t->c */
                         #ifdef CLIQUE_OUT_FILE
-                        write_clique_file(t->c, cfile);
+                        //write_clique_file(t->c, cfile);
                         #endif
                     }
                     release_task(t);
@@ -215,7 +215,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                             clique_num++;
                             // output clique
                             #ifdef CLIQUE_OUT_FILE
-                            write_clique_file(c, cfile);
+                            //write_clique_file(c, cfile);
                             #endif
                             delete candidate;
                             delete c;
