@@ -22,6 +22,8 @@ uint64_t  curr_iteration_task_num;
 uint64_t  max_clique_size;
 uint64_t  clique_num;
 int       task_per_iter;
+// use this variable to compare candidate's size with cache size
+uint32_t  max_cand_size;
 
 /* compute the intersection of two sets */
 vlist* 
@@ -127,6 +129,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
             cur_c->insert(vertex.id());
 
+            max_cand_size = std::max(max_cand_size, cur_cand->size());
             task_t *first_task = new task_t( cur_cand, cur_c, vertex.id() );
             cur_tlist.insert_tail(first_task);
             vertex.set_data(cur_tlist);
@@ -140,13 +143,11 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                 }
             }
 
-            max_clique_size = 0;
-            clique_num = 0;
 
         } else {
             
             // In this iteration, every vertex should process @task_per_iter tasks;
-            for(int i = 0; i != task_per_iter; ++i){
+            for(int i = 0; i < task_per_iter; ++i){
 
                 tasklist *tasks = vertex.get_data_ptr();
                 task_t   *t     = tasks->head;
@@ -158,7 +159,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                 converged = false;
 
                 tasks->remove_head();
-                if ( t->cand->size() == 0) {
+                if ( t->cand->size() == 0 ) {
                     if( t->c->size() != 0 ){
                         clique_num++;
                         max_clique_size = std::max(max_clique_size, t->c->size());
@@ -206,6 +207,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
                         vlist *candidate = get_intsct(adjlist, t->cand);
                         vlist *c         = set_insert_copy(t->c, *iter);
+                        
+                        max_cand_size = std::max(max_cand_size, candidate->size());
 
                         if (candidate->size() != 0) {
                             task_t *tmp = new task_t(candidate, c, *iter);
@@ -264,8 +267,12 @@ int main(int argc, const char ** argv) {
     std::string filename = get_option_string("file");  // Base filename
     int niters           = get_option_int("niters", 1000000000); // Number of iterations
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
-    task_per_iter        = get_option_int("taskPerIter", 10);// get the task's number of each iteration
 
+    /* global variables init */ 
+    task_per_iter        = get_option_int("taskPerIter", 10);// get the task's number of each iteration
+    max_clique_size = 0;
+    clique_num = 0;
+    max_cand_size = 0;
 #ifdef CLIQUE_OUT_FILE
     std::string clique_filename = filename+".graphchi.clique";
     cfile.open(clique_filename.c_str());
