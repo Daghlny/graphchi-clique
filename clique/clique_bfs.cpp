@@ -123,7 +123,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
             for( int i = 0; i != vertex.num_edges(); ++i){
                 
-                cur_cand->insert(vertex.edge(i)->vertex_id());
+                if( vertex.edge(i)->vertex_id() > vertex.id() )
+                    cur_cand->insert(vertex.edge(i)->vertex_id());
                 all_neibors->insert(vertex.edge(i)->vertex_id());
             }
 
