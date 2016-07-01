@@ -130,7 +130,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
             cur_c->insert(vertex.id());
 
-            max_cand_size = std::max(max_cand_size, cur_cand->size());
+            max_cand_size = std::max(max_cand_size, (uint32_t)cur_cand->size());
             task_t *first_task = new task_t( cur_cand, cur_c, vertex.id() );
             cur_tlist.insert_tail(first_task);
             vertex.set_data(cur_tlist);
@@ -209,7 +209,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                         vlist *candidate = get_intsct(adjlist, t->cand);
                         vlist *c         = set_insert_copy(t->c, *iter);
                         
-                        max_cand_size = std::max(max_cand_size, candidate->size());
+                        max_cand_size = std::max(max_cand_size, (uint32_t)candidate->size());
 
                         if (candidate->size() != 0) {
                             task_t *tmp = new task_t(candidate, c, *iter);
@@ -294,6 +294,7 @@ int main(int argc, const char ** argv) {
     
     std::cout << "Total clique number: " << clique_num << std::endl;
     std::cout << "Maximum clique's size: " << max_clique_size << std::endl;
+    std::cout << "Maximum Candidate's size: " << max_cand_size << std::endl;
 
 #ifdef CLIQUE_OUT_FILE
     cfile.close();
