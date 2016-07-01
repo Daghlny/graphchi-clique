@@ -132,6 +132,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
             if( max_cand_size < (uint32_t)cur_cand->size() ){
                 std::cout << " Maximum Candidate Size Now: " << cur_cand->size() << std::endl;
+                std::cout << " This vertex is: " << vertex.id() << std::endl;
                 max_cand_size = (uint32_t)cur_cand->size();
             }
 
@@ -151,7 +152,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
         } else {
 
-            std::cout << " Current Vertex processing is: " << vertex.id() << std::endl;
+            //std::cout << " Current Vertex processing is: " << vertex.id() << std::endl;
             
             // In this iteration, every vertex should process @task_per_iter tasks;
             for(int i = 0; i < task_per_iter; ++i){
@@ -217,6 +218,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
                         if( max_cand_size < (uint32_t)candidate->size() ) {
                             std::cout << " Maximum Candidate Size Now: " << (uint32_t)candidate->size() << std::endl;
+                            std::cout << " This vertex is: " << vertex.id() << std::endl;
                             max_cand_size = (uint32_t)candidate->size();
                         }
 
