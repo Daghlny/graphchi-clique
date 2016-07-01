@@ -96,8 +96,8 @@ int main(int argc, const char ** argv) {
     /* Run */
     graphchi_engine<vid_t, vid_t> engine(filename, nshards, scheduler, m); 
     engine.set_modifies_inedges(false); // Improves I/O performance.
-          PagerankProgram program;
-        engine.run(program, niters);
+    PagerankProgram program;
+    engine.run(program, niters);
 
     
     /* Output top ranked vertices */

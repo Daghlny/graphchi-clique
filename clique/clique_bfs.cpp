@@ -45,7 +45,7 @@ get_intsct(vlist *v1, vlist *v2){
 }
 
 /* release the memory of a task */
-void
+inline void
 release_task(task_t *t){
    
     delete t->cand;
@@ -130,7 +130,11 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
             cur_c->insert(vertex.id());
 
-            max_cand_size = std::max(max_cand_size, (uint32_t)cur_cand->size());
+            if( max_cand_size < (uint32_t)cur_cand->size() ){
+                std::cout << " Maximum Candidate Size Now: " << cur_cand->size() << std::endl;
+                max_cand_size = (uint32_t)cur_cand->size();
+            }
+
             task_t *first_task = new task_t( cur_cand, cur_c, vertex.id() );
             cur_tlist.insert_tail(first_task);
             vertex.set_data(cur_tlist);
@@ -146,6 +150,8 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
 
         } else {
+
+            std::cout << " Current Vertex processing is: " << vertex.id() << std::endl;
             
             // In this iteration, every vertex should process @task_per_iter tasks;
             for(int i = 0; i < task_per_iter; ++i){
@@ -208,8 +214,11 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
                         vlist *candidate = get_intsct(adjlist, t->cand);
                         vlist *c         = set_insert_copy(t->c, *iter);
-                        
-                        max_cand_size = std::max(max_cand_size, (uint32_t)candidate->size());
+
+                        if( max_cand_size < (uint32_t)candidate->size() ) {
+                            std::cout << " Maximum Candidate Size Now: " << (uint32_t)candidate->size() << std::endl;
+                            max_cand_size = (uint32_t)candidate->size();
+                        }
 
                         if (candidate->size() != 0) {
                             task_t *tmp = new task_t(candidate, c, *iter);
