@@ -114,6 +114,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
         // Construct a new task that contains all @vertex's neighbors
         // then insert it into task queue.
         if (gcontext.iteration == 0) {
+            std::cout << " Current Vertex is: " << vertex.id() << std::endl;
             
             tasklist cur_tlist(NULL, NULL);
             vlist *cur_cand = new vlist();
@@ -279,6 +280,7 @@ int main(int argc, const char ** argv) {
     std::string filename = get_option_string("file");  // Base filename
     int niters           = get_option_int("niters", 1000000000); // Number of iterations
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
+
 
     /* global variables init */ 
     task_per_iter        = get_option_int("taskPerIter", 10);// get the task's number of each iteration
