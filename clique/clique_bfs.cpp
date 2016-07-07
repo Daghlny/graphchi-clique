@@ -11,19 +11,14 @@
 
 using namespace graphchi;
 
-#define CLIQUE_OUT_FILE
-//#define CLIQUE_DEBUG
+//#define CLIQUE_OUT_FILE
 
-#ifdef CLIQUE_DEBUG
-std::ofstream dfile;
-#endif
-
-uint64_t  curr_iteration_task_num;
-uint64_t  max_clique_size;
-uint64_t  clique_num;
-int       task_per_iter;
-// use this variable to compare candidate's size with cache size
-uint32_t  max_cand_size;
+/* Global variables definitions */
+uint64_t  curr_iteration_task_num; // current iteration remaining tasks
+uint64_t  max_clique_size;         // the maximum clique's size
+uint64_t  clique_num;              // total maximal clique's number
+int       task_per_iter;           // input parameter, indicate the maximum number of tasks in each iteration
+uint32_t  max_cand_size;           // use this variable to compare candidate's size with cache size
 
 /* compute the intersection of two sets */
 vlist* 
@@ -153,9 +148,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
         } else {
 
-            //std::cout << " Current Vertex processing is: " << vertex.id() << std::endl;
-            
-            // In this iteration, every vertex should process @task_per_iter tasks;
+            // at each iteration, every vertex should process @task_per_iter tasks;
             for(int i = 0; i < task_per_iter; ++i){
 
                 tasklist *tasks = vertex.get_data_ptr();
@@ -167,6 +160,11 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
                 converged = false;
 
+                // these codes below are just for debugging
+                // add-time: 16-7-7 17:07
+                std::cout << "vertex id: " << vertex.id() << std::endl;
+                std::cout << "Candidate Size: " << t->cand->size() << std::endl;
+
                 tasks->remove_head();
                 if ( t->cand->size() == 0 ) {
                     if( t->c->size() != 0 ){
@@ -175,7 +173,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
 
                         /* output maximal clique in t->c */
                         #ifdef CLIQUE_OUT_FILE
-                        //write_clique_file(t->c, cfile);
+                        write_clique_file(t->c, cfile);
                         #endif
                     }
                     release_task(t);
@@ -231,7 +229,7 @@ struct CliqueGraphChiProgram : public GraphChiProgram<VertexDataType, EdgeDataTy
                             clique_num++;
                             // output clique
                             #ifdef CLIQUE_OUT_FILE
-                            //write_clique_file(c, cfile);
+                            write_clique_file(c, cfile);
                             #endif
                             delete candidate;
                             delete c;
@@ -282,11 +280,12 @@ int main(int argc, const char ** argv) {
     bool scheduler       = get_option_int("scheduler", 0); // Whether to use selective scheduling
 
 
-    /* global variables init */ 
-    task_per_iter        = get_option_int("taskPerIter", 10);// get the task's number of each iteration
+    /* global variables initialization */ 
+    task_per_iter   = get_option_int("taskPerIter", 10);// get the task's number of each iteration
     max_clique_size = 0;
-    clique_num = 0;
-    max_cand_size = 0;
+    clique_num      = 0;
+    max_cand_size   = 0;
+
 #ifdef CLIQUE_OUT_FILE
     std::string clique_filename = filename+".graphchi.clique";
     cfile.open(clique_filename.c_str());
