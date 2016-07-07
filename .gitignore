@@ -8,6 +8,7 @@ result/*
 *.perf.data
 perf.data
 *.perf.data.old
+*.log
 
 # Compiled Object files
 *.slo
