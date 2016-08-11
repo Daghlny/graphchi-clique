@@ -34,8 +34,6 @@ struct ComputeCandSum: public GraphChiProgram<VertexDataType, EdgeDataType> {
         // Construct a new task that contains all @vertex's neighbors
         // then insert it into task queue.
         if (gcontext.iteration == 0) {
-            std::cout << " Current Vertex is: " << vertex.id() << std::endl;
-
             /* @cur_cand and @cur_c is used for the first task of @vertex */
             vlist *cur_cand = new vlist();
 
@@ -55,7 +53,6 @@ struct ComputeCandSum: public GraphChiProgram<VertexDataType, EdgeDataType> {
     
     void before_iteration(int iteration, graphchi_context &gcontext) {
         converged = true;
-        curr_iteration_task_num = 0;
     }
     
     void after_iteration(int iteration, graphchi_context &gcontext) {
@@ -81,7 +78,7 @@ int main(int argc, const char ** argv) {
     
     /* Metrics object for keeping track of performance counters
        and other information. Currently required. */
-    metrics m("Maximal Cliques Enumeration");
+    metrics m("Candidate Set Size Sum Compute");
     
     /* Basic arguments for application */
     std::string filename = get_option_string("file");  // Base filename
@@ -104,6 +101,17 @@ int main(int argc, const char ** argv) {
     
     /* Report execution metrics */
     metrics_report(m);
+
+    /* Personal statics report */
+    for(int i = 0; i != 40; i++)
+        std::cout << "*";
+    std::cout << " Personal Report ";
+    for(int i = 0; i != 40; i++)
+        std::cout << "*";
+    std::cout << std::endl;
+
+    std::cout << "Total Cand Sets' Sum: " << total_cand_size << std::endl;
+
     return 0;
 }
 
